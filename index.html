@@ -172,13 +172,11 @@ select{appearance:none;cursor:pointer;padding-right:32px}
     <div class="model-label">Model</div>
     <div class="msel-wrap">
       <select class="msel" id="modelSel">
-        <option value="phi3">phi3 — Fast, low RAM (4GB)</option>
-        <option value="llama3.2" selected>llama3.2 — Best balance (8GB)</option>
-        <option value="mistral">mistral — Writing tasks (8GB)</option>
-        <option value="gemma2">gemma2 — Creative writing (8GB)</option>
-        <option value="llama3.1">llama3.1</option>
-        <option value="qwen2.5">qwen2.5</option>
-        <option value="deepseek-r1">deepseek-r1</option>
+        <option value="llama-3.1-8b-instant" selected>llama-3.1-8b-instant — Fast & Balanced</option>
+        <option value="llama-3.3-70b-versatile">llama-3.3-70b-versatile — High Quality</option>
+        <option value="mixtral-8x7b-32768">mixtral-8x7b-32768 — Creative & Fast</option>
+        <option value="gemma2-9b-it">gemma2-9b-it</option>
+        <option value="deepseek-r1-distill-llama-70b">deepseek-r1-distill-llama-70b</option>
       </select>
     </div>
     <div class="ollama-status checking" id="ollamaStatus">
@@ -324,7 +322,7 @@ select{appearance:none;cursor:pointer;padding-right:32px}
 <div class="toast-container" id="toastCtr"></div>
 
 <script>
-const SERVER = 'http://localhost:3000';
+const SERVER = '';
 let state = {
   type:'Product Description', tone:'Professional', output:'',
   history: JSON.parse(localStorage.getItem('wp_h')||'[]'),
@@ -367,7 +365,7 @@ async function checkOllama(){
     if(models.length>0) ms.innerHTML=models.map(m=>`<option value="${m.name}">${m.name}</option>`).join('');
     el.className='ollama-status ok'; tx.textContent=`Connected — ${models.length} model${models.length!==1?'s':''} available`;
   }catch{
-    el.className='ollama-status err'; tx.textContent='Not connected — run: node server.js';
+    el.className='ollama-status err'; tx.textContent='Not connected — API issue';
   }
 }
 
@@ -423,7 +421,7 @@ async function generate(){
     addHistory(prompt,html); showToast('Content generated.','success');
   }catch(e){
     clearInterval(pi); document.getElementById('progWrap').style.display='none';
-    out.innerHTML=`<p style="color:var(--danger)">${e.message}<br><br>Make sure:<br>1. node server.js is running<br>2. ollama serve is running<br>3. ollama pull ${model} was done</p>`;
+    out.innerHTML=`<p style="color:var(--danger)">${e.message}<br><br>Make sure:<br>1. You have set GROQ_API_KEY in your Vercel Dashboard.<br>2. You redeployed the project if you just added it.</p>`;
     showToast('Generation failed.','error');
   }finally{
     state.busy=false; btn.disabled=false;
