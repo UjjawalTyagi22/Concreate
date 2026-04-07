@@ -1,0 +1,506 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Concreate</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@300;400;500;600;700;800&display=swap" rel="stylesheet"/>
+<script src="https://code.iconify.design/iconify-icon/3.0.0/iconify-icon.min.js"></script>
+<style>
+:root {
+  --bg:#e8e8e8;--bg2:#f0f0f0;--bg3:#e0e0e0;--surface:#d8d8d8;
+  --border:#c4c4c4;--border-light:#aaaaaa;
+  --primary:#1a1a1a;--primary-dim:#ebebeb;--primary-text:#ffffff;
+  --accent:#555555;--accent-dim:#e8e8e8;
+  --text:#1a1a1a;--text-muted:#888888;--text-dim:#555555;
+  --danger:#cc3333;--danger-dim:#fce8e8;
+  --r-sm:6px;--r-md:10px;--r-lg:16px;
+  --font-head:'Geist',sans-serif;--font-body:'Geist',sans-serif;
+  --shadow:0 2px 12px rgba(0,0,0,0.08);
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+body{font-family:var(--font-body);background:var(--bg);color:var(--text);min-height:100vh;display:flex;overflow:hidden}
+::-webkit-scrollbar{width:6px}::-webkit-scrollbar-track{background:transparent}::-webkit-scrollbar-thumb{background:var(--border);border-radius:3px}
+
+.sidebar{width:260px;background:var(--bg2);border-right:1px solid var(--border);display:flex;flex-direction:column;flex-shrink:0}
+.sidebar-brand{padding:24px 24px 18px;border-bottom:1px solid var(--border)}
+.brand-logo{display:flex;align-items:center;gap:10px}
+.brand-icon{width:32px;height:32px;background:var(--primary);border-radius:8px;display:flex;align-items:center;justify-content:center;color:#ffffff}
+.brand-name{font-family:var(--font-head);font-size:20px;font-weight:800;color:var(--text);letter-spacing:-0.5px}
+
+.model-section{padding:14px 16px;border-bottom:1px solid var(--border)}
+.model-label{font-size:10px;font-weight:600;letter-spacing:1px;text-transform:uppercase;color:var(--text-muted);margin-bottom:8px}
+.msel-wrap{position:relative}
+.msel-wrap::after{content:'';position:absolute;right:10px;top:50%;transform:translateY(-50%);width:0;height:0;border-left:4px solid transparent;border-right:4px solid transparent;border-top:5px solid var(--text-muted);pointer-events:none}
+select.msel{width:100%;font-family:var(--font-body);font-size:13px;color:var(--text);background:var(--bg3);border:1px solid var(--border);border-radius:var(--r-md);padding:9px 28px 9px 12px;outline:none;appearance:none;cursor:pointer;transition:border-color .15s}
+select.msel:focus{border-color:var(--primary)}
+.ollama-status{display:flex;align-items:center;gap:6px;padding:7px 10px;margin-top:8px;border-radius:var(--r-sm);font-size:12px}
+.ollama-status.ok{background:#f0f5f0;color:#2d6a2d;border:1px solid #c3dbc3}
+.ollama-status.err{background:var(--danger-dim);color:var(--danger);border:1px solid #f0c0c0}
+.ollama-status.checking{background:var(--bg3);color:var(--text-muted);border:1px solid var(--border)}
+.status-dot{width:6px;height:6px;border-radius:50%;background:currentColor;flex-shrink:0}
+
+.sidebar-section{padding:18px 12px 8px}
+.sidebar-label{font-size:10px;font-weight:600;letter-spacing:1px;text-transform:uppercase;color:var(--text-muted);padding:0 12px;margin-bottom:6px}
+.nav-item{display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:var(--r-md);color:var(--text-dim);font-size:14px;font-weight:500;cursor:pointer;transition:all .15s;position:relative}
+.nav-item:hover{background:var(--bg3);color:var(--text)}
+.nav-item.active{background:var(--primary-dim);color:var(--primary)}
+.nav-item.active::before{content:'';position:absolute;left:0;top:20%;bottom:20%;width:3px;background:var(--primary);border-radius:0 3px 3px 0}
+.nav-badge{margin-left:auto;font-size:11px;font-weight:600;background:var(--bg3);color:var(--text-muted);padding:2px 7px;border-radius:20px;border:1px solid var(--border)}
+.nav-item.active .nav-badge{background:var(--primary-dim);color:var(--primary)}
+
+.sidebar-footer{margin-top:auto;padding:14px 12px;border-top:1px solid var(--border)}
+.user-card{display:flex;align-items:center;gap:12px;padding:10px 12px;border-radius:var(--r-md);cursor:pointer;transition:background .15s}
+.user-card:hover{background:var(--bg3)}
+.avatar{width:36px;height:36px;border-radius:10px;background:var(--primary);display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;color:white;flex-shrink:0}
+.user-meta{flex:1}
+.user-name{font-size:13px;font-weight:600;color:var(--text)}
+.user-plan{font-size:11px;color:var(--text-muted)}
+
+.main{flex:1;display:flex;flex-direction:column;overflow:hidden}
+.topbar{padding:16px 36px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;background:var(--bg2);flex-shrink:0}
+.topbar-title{font-size:15px;font-weight:600;color:var(--text)}
+.topbar-sub{font-size:12px;color:var(--text-muted);margin-top:1px}
+.status-badge{display:flex;align-items:center;gap:8px;padding:7px 14px;background:var(--bg3);border:1px solid var(--border);border-radius:var(--r-md);font-size:12px;font-weight:500;color:var(--text-dim)}
+
+.panels{flex:1;display:grid;grid-template-columns:1fr 1fr;overflow:hidden}
+.panel{display:flex;flex-direction:column;overflow-y:auto;padding:24px 28px;gap:18px}
+.panel:first-child{border-right:1px solid var(--border)}
+.panel-heading{font-family:var(--font-head);font-size:16px;font-weight:600;color:var(--text);display:flex;align-items:center;gap:8px;letter-spacing:-0.2px}
+.panel-heading iconify-icon{color:var(--text-muted)}
+
+.type-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.type-card{display:flex;align-items:center;gap:9px;padding:9px 12px;border:1px solid var(--border);border-radius:var(--r-md);background:var(--bg2);color:var(--text-dim);font-size:13px;font-weight:500;cursor:pointer;transition:all .15s}
+.type-card:hover{border-color:var(--border-light);color:var(--text);background:var(--bg3)}
+.type-card.active{border-color:var(--primary);background:var(--primary-dim);color:var(--primary)}
+
+.field{display:flex;flex-direction:column;gap:7px}
+.label{font-size:11px;font-weight:600;letter-spacing:.5px;color:var(--text-muted);text-transform:uppercase}
+textarea,select{font-family:var(--font-body);font-size:14px;color:var(--text);background:var(--bg3);border:1px solid var(--border);border-radius:var(--r-md);padding:12px;outline:none;transition:border-color .15s,box-shadow .15s;width:100%;resize:none;line-height:1.6}
+textarea::placeholder{color:var(--text-muted)}
+textarea:focus,select:focus{border-color:var(--primary);box-shadow:0 0 0 3px rgba(0,0,0,0.06)}
+select{appearance:none;cursor:pointer;padding-right:32px}
+.sel-wrap{position:relative}
+.sel-wrap::after{content:'';position:absolute;right:12px;top:50%;transform:translateY(-50%);width:0;height:0;border-left:4px solid transparent;border-right:4px solid transparent;border-top:5px solid var(--text-muted);pointer-events:none}
+.options-row{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.tone-row{display:flex;gap:6px;flex-wrap:wrap}
+.tone-pill{padding:5px 12px;border:1px solid var(--border);border-radius:20px;font-size:12px;font-weight:500;color:var(--text-dim);cursor:pointer;transition:all .15s;background:var(--bg2)}
+.tone-pill:hover{border-color:var(--border-light);color:var(--text)}
+.tone-pill.active{border-color:var(--primary);background:var(--primary-dim);color:var(--primary);font-weight:600}
+.char-info{display:flex;justify-content:space-between;margin-top:-10px}
+.char-hint{font-size:11px;color:var(--text-muted)}
+
+.gen-btn{display:flex;align-items:center;justify-content:center;gap:10px;padding:13px;background:var(--primary);color:#ffffff;border:none;border-radius:var(--r-md);font-family:var(--font-body);font-size:14px;font-weight:600;cursor:pointer;transition:all .2s;width:100%;letter-spacing:.3px}
+.gen-btn:hover:not(:disabled){background:#333333}
+.gen-btn:disabled{opacity:.5;cursor:not-allowed}
+
+.output-header{display:flex;align-items:center;justify-content:space-between}
+.out-meta{font-size:11px;color:var(--text-muted);display:flex;align-items:center;gap:10px}
+.meta-chip{display:flex;align-items:center;gap:4px;padding:3px 8px;background:var(--bg3);border-radius:20px;border:1px solid var(--border)}
+.output-area{flex:1;background:var(--bg2);border:1px solid var(--border);border-radius:var(--r-lg);padding:20px;font-size:14px;line-height:1.8;color:var(--text);min-height:220px;overflow-y:auto}
+.output-area.empty{display:flex;align-items:center;justify-content:center;flex-direction:column;gap:12px;color:var(--text-muted)}
+.empty-icon{font-size:32px;opacity:.2}
+.empty-text{font-size:14px;text-align:center;line-height:1.6;color:var(--text-muted)}
+.output-area p{margin-bottom:14px}
+.output-area p:last-child{margin-bottom:0}
+.output-area strong{color:var(--text);font-weight:600}
+.output-area em{color:var(--text-dim)}
+.out-actions{display:flex;gap:8px;flex-wrap:wrap}
+
+.btn{display:flex;align-items:center;gap:6px;padding:7px 13px;border-radius:var(--r-sm);font-family:var(--font-body);font-size:13px;font-weight:500;cursor:pointer;border:1px solid var(--border);transition:all .15s;background:var(--bg2);color:var(--text-dim)}
+.btn:hover{background:var(--bg3);color:var(--text);border-color:var(--border-light)}
+.btn-ghost{background:transparent;color:var(--text-muted);border-color:transparent}
+.btn-ghost:hover{color:var(--text);background:var(--bg3);border-color:var(--border)}
+.btn-accent{background:var(--primary);color:#ffffff;border-color:var(--primary)}
+.btn-accent:hover{background:#333333;border-color:#333333}
+.btn-danger{background:var(--danger-dim);color:var(--danger);border-color:#f0c0c0}
+.btn-danger:hover{opacity:.85}
+
+.prog-wrap{height:2px;background:var(--border);border-radius:3px;overflow:hidden}
+.prog-bar{height:100%;background:var(--primary);border-radius:3px;width:0%;transition:width .3s}
+
+.history-view,.saved-view,.templates-view{display:none;flex-direction:column;overflow:hidden;grid-column:1/-1}
+.history-view.active,.saved-view.active,.templates-view.active{display:flex}
+.view-header{padding:24px 32px 18px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;background:var(--bg2)}
+.view-title{font-family:var(--font-head);font-size:20px;font-weight:700;color:var(--text);letter-spacing:-0.3px}
+.list-area{flex:1;overflow-y:auto;padding:18px 32px;display:flex;flex-direction:column;gap:10px;background:var(--bg)}
+.tgrid{flex:1;overflow-y:auto;padding:18px 32px;display:grid;grid-template-columns:repeat(3,1fr);gap:14px;background:var(--bg)}
+.hist-item{background:var(--bg2);border:1px solid var(--border);border-radius:var(--r-lg);padding:14px 18px;cursor:pointer;transition:all .15s;display:flex;align-items:flex-start;gap:12px}
+.hist-item:hover{border-color:var(--border-light);background:var(--bg3)}
+.hist-icon{width:34px;height:34px;border-radius:var(--r-sm);background:var(--primary-dim);color:var(--text-dim);display:flex;align-items:center;justify-content:center;font-size:15px;flex-shrink:0;border:1px solid var(--border)}
+.hist-body{flex:1;overflow:hidden}
+.hist-prompt{font-size:13px;font-weight:600;color:var(--text);margin-bottom:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.hist-preview{font-size:12px;color:var(--text-muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.hist-meta{font-size:11px;color:var(--text-muted);margin-top:5px;display:flex;gap:8px}
+.hist-actions{display:flex;gap:5px;align-items:flex-start}
+.empty-state{text-align:center;padding:50px 20px;color:var(--text-muted);display:flex;flex-direction:column;align-items:center;gap:10px}
+.empty-state iconify-icon{font-size:44px;opacity:.15}
+
+.tcard{background:var(--bg2);border:1px solid var(--border);border-radius:var(--r-lg);padding:18px;cursor:pointer;transition:all .15s;display:flex;flex-direction:column;gap:9px}
+.tcard:hover{border-color:var(--primary);box-shadow:var(--shadow)}
+.tcard-icon{width:36px;height:36px;border-radius:var(--r-md);background:var(--primary-dim);color:var(--text-dim);display:flex;align-items:center;justify-content:center;font-size:17px;border:1px solid var(--border)}
+.tcard-name{font-size:14px;font-weight:600;color:var(--text)}
+.tcard-desc{font-size:12px;color:var(--text-muted);line-height:1.5}
+.tcard-tag{font-size:10px;font-weight:600;padding:3px 8px;border-radius:20px;background:var(--bg3);color:var(--text-dim);display:inline-block;border:1px solid var(--border)}
+
+.spinner{width:15px;height:15px;border:2px solid rgba(255,255,255,.3);border-top-color:#ffffff;border-radius:50%;animation:spin .7s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+.toast-container{position:fixed;bottom:22px;right:22px;display:flex;flex-direction:column;gap:8px;z-index:9999;pointer-events:none}
+.toast{display:flex;align-items:center;gap:10px;padding:11px 15px;background:var(--bg2);border:1px solid var(--border);border-radius:var(--r-md);font-size:13px;color:var(--text);box-shadow:var(--shadow);animation:slideIn .25s ease;max-width:300px}
+.toast.success{border-left:3px solid #2d6a2d}
+.toast.error{border-left:3px solid var(--danger)}
+.toast.info{border-left:3px solid var(--text-muted)}
+@keyframes slideIn{from{opacity:0;transform:translateX(16px)}to{opacity:1;transform:translateX(0)}}
+@keyframes fadeUp{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+.fade-up{animation:fadeUp .3s ease}
+.generator-panels{display:contents}
+</style>
+</head>
+<body>
+
+<aside class="sidebar">
+  <div class="sidebar-brand">
+    <div class="brand-logo">
+      <div class="brand-icon"><iconify-icon icon="lucide:circle-dashed" style="font-size:16px"></iconify-icon></div>
+      <span class="brand-name">Concreate</span>
+    </div>
+  </div>
+
+  <div class="model-section">
+    <div class="model-label">Model</div>
+    <div class="msel-wrap">
+      <select class="msel" id="modelSel">
+        <option value="phi3">phi3 — Fast, low RAM (4GB)</option>
+        <option value="llama3.2" selected>llama3.2 — Best balance (8GB)</option>
+        <option value="mistral">mistral — Writing tasks (8GB)</option>
+        <option value="gemma2">gemma2 — Creative writing (8GB)</option>
+        <option value="llama3.1">llama3.1</option>
+        <option value="qwen2.5">qwen2.5</option>
+        <option value="deepseek-r1">deepseek-r1</option>
+      </select>
+    </div>
+    <div class="ollama-status checking" id="ollamaStatus">
+      <div class="status-dot"></div>
+      <span id="ollamaStatusText">Checking connection</span>
+    </div>
+  </div>
+
+  <div class="sidebar-section">
+    <div class="sidebar-label">Workspace</div>
+    <div class="nav-item active" data-view="generator"><iconify-icon icon="lucide:pen-tool"></iconify-icon> Generator</div>
+    <div class="nav-item" data-view="history"><iconify-icon icon="lucide:history"></iconify-icon> History <span class="nav-badge" id="historyCount">0</span></div>
+    <div class="nav-item" data-view="saved"><iconify-icon icon="lucide:bookmark"></iconify-icon> Saved <span class="nav-badge" id="savedCount">0</span></div>
+    <div class="nav-item" data-view="templates"><iconify-icon icon="lucide:layout-template"></iconify-icon> Templates</div>
+  </div>
+
+  <div class="sidebar-footer">
+    <div class="user-card">
+      <div class="avatar">SJ</div>
+      <div class="user-meta">
+        <div class="user-name">Sarah Jenkins</div>
+        
+      </div>
+    </div>
+  </div>
+</aside>
+
+<div class="main">
+  <div class="topbar">
+    <div>
+      <div class="topbar-title" id="topbarTitle">Content Generator</div>
+      <div class="topbar-sub">Powered by Ollama</div>
+    </div>
+    <div class="status-badge">
+      <iconify-icon icon="lucide:server" style="font-size:13px"></iconify-icon>
+      Local
+    </div>
+  </div>
+
+  <div class="panels" id="mainPanels">
+
+    <div class="generator-panels" id="viewGenerator">
+
+      <div class="panel">
+        <div class="panel-heading"><iconify-icon icon="lucide:edit-3"></iconify-icon> Compose</div>
+
+        <div class="field">
+          <div class="label">Content Type</div>
+          <div class="type-grid" id="typeGrid">
+            <div class="type-card active" data-type="Product Description"><iconify-icon icon="lucide:shopping-bag"></iconify-icon> Product Desc</div>
+            <div class="type-card" data-type="Short Story"><iconify-icon icon="lucide:book-open"></iconify-icon> Short Story</div>
+            <div class="type-card" data-type="Poem"><iconify-icon icon="lucide:feather"></iconify-icon> Poem</div>
+            <div class="type-card" data-type="Resume Summary"><iconify-icon icon="lucide:briefcase"></iconify-icon> Resume Summary</div>
+            <div class="type-card" data-type="Blog Post Intro"><iconify-icon icon="lucide:rss"></iconify-icon> Blog Post</div>
+            <div class="type-card" data-type="Email"><iconify-icon icon="lucide:mail"></iconify-icon> Email</div>
+            <div class="type-card" data-type="Social Media Post"><iconify-icon icon="lucide:share-2"></iconify-icon> Social Media</div>
+            <div class="type-card" data-type="Ad Copy"><iconify-icon icon="lucide:megaphone"></iconify-icon> Ad Copy</div>
+          </div>
+        </div>
+
+        <div class="options-row">
+          <div class="field">
+            <div class="label">Length</div>
+            <div class="sel-wrap"><select id="lengthSel"><option value="short">Short (~100 words)</option><option value="medium" selected>Medium (~250 words)</option><option value="long">Long (~500 words)</option></select></div>
+          </div>
+          <div class="field">
+            <div class="label">Language</div>
+            <div class="sel-wrap"><select id="langSel"><option>English</option><option>Spanish</option><option>French</option><option>German</option><option>Hindi</option><option>Portuguese</option></select></div>
+          </div>
+        </div>
+
+        <div class="field">
+          <div class="label">Tone</div>
+          <div class="tone-row" id="toneRow">
+            <div class="tone-pill active" data-tone="Professional">Professional</div>
+            <div class="tone-pill" data-tone="Friendly">Friendly</div>
+            <div class="tone-pill" data-tone="Witty">Witty</div>
+            <div class="tone-pill" data-tone="Formal">Formal</div>
+            <div class="tone-pill" data-tone="Inspirational">Inspirational</div>
+            <div class="tone-pill" data-tone="Casual">Casual</div>
+          </div>
+        </div>
+
+        <div class="field">
+          <div class="label">Your Prompt</div>
+          <textarea id="promptInput" rows="5" placeholder="Describe what you'd like to write...">Write a catchy and engaging product description for a smart coffee mug that keeps drinks warm for 12 hours. Mention it's perfect for busy office workers and remote freelancers.</textarea>
+          <div class="char-info">
+            <span class="char-hint" id="charCount">0 characters</span>
+            <span class="char-hint">Ctrl+Enter to generate</span>
+          </div>
+        </div>
+
+        <div class="prog-wrap" id="progWrap" style="display:none"><div class="prog-bar" id="progBar"></div></div>
+
+        <button class="gen-btn" id="genBtn" onclick="generate()">
+          <iconify-icon icon="lucide:arrow-right" style="font-size:15px"></iconify-icon> Generate Content
+        </button>
+      </div>
+
+      <div class="panel">
+        <div class="output-header">
+          <div class="panel-heading"><iconify-icon icon="lucide:file-text"></iconify-icon> Output</div>
+          <div class="out-meta" id="outMeta" style="display:none">
+            <div class="meta-chip"><iconify-icon icon="lucide:type" style="font-size:11px"></iconify-icon><span id="wcDisplay">0 words</span></div>
+            <div class="meta-chip"><iconify-icon icon="lucide:clock" style="font-size:11px"></iconify-icon><span id="timeDisplay">0s</span></div>
+          </div>
+        </div>
+
+        <div class="output-area empty" id="outputArea">
+          <iconify-icon icon="lucide:file-text" class="empty-icon"></iconify-icon>
+          <div class="empty-text">Generated content will appear here.</div>
+        </div>
+
+        <div class="out-actions" id="outActions" style="display:none">
+          <button class="btn" onclick="copyOutput()"><iconify-icon icon="lucide:copy" style="font-size:13px"></iconify-icon> Copy</button>
+          <button class="btn" onclick="saveToSaved()"><iconify-icon icon="lucide:bookmark" style="font-size:13px"></iconify-icon> Save</button>
+          <button class="btn" onclick="downloadOutput()"><iconify-icon icon="lucide:download" style="font-size:13px"></iconify-icon> Download</button>
+          <button class="btn btn-accent" onclick="generate()"><iconify-icon icon="lucide:refresh-cw" style="font-size:13px"></iconify-icon> Retry</button>
+          <button class="btn btn-ghost" onclick="clearOutput()" style="margin-left:auto"><iconify-icon icon="lucide:trash-2" style="font-size:13px"></iconify-icon></button>
+        </div>
+      </div>
+
+    </div>
+
+    <div class="history-view" id="viewHistory">
+      <div class="view-header"><div class="view-title">Generation History</div><button class="btn btn-danger" onclick="clearHistory()"><iconify-icon icon="lucide:trash-2" style="font-size:13px"></iconify-icon> Clear All</button></div>
+      <div class="list-area" id="historyList"><div class="empty-state"><iconify-icon icon="lucide:history"></iconify-icon><p>No history yet.</p></div></div>
+    </div>
+
+    <div class="saved-view" id="viewSaved">
+      <div class="view-header"><div class="view-title">Saved Results</div><button class="btn btn-danger" onclick="clearSaved()"><iconify-icon icon="lucide:trash-2" style="font-size:13px"></iconify-icon> Clear All</button></div>
+      <div class="list-area" id="savedList"><div class="empty-state"><iconify-icon icon="lucide:bookmark"></iconify-icon><p>Nothing saved yet.</p></div></div>
+    </div>
+
+    <div class="templates-view" id="viewTemplates">
+      <div class="view-header"><div class="view-title">Prompt Templates</div></div>
+      <div class="tgrid" id="templatesList"></div>
+    </div>
+
+  </div>
+</div>
+
+<div class="toast-container" id="toastCtr"></div>
+
+<script>
+const SERVER = 'http://localhost:3000';
+let state = {
+  type:'Product Description', tone:'Professional', output:'',
+  history: JSON.parse(localStorage.getItem('wp_h')||'[]'),
+  saved: JSON.parse(localStorage.getItem('wp_s')||'[]'),
+  busy: false
+};
+const templates = [
+  {icon:'lucide:shopping-bag',name:'SaaS Product Launch',tag:'Marketing',type:'Product Description',prompt:'Write a compelling product description for a new project management SaaS tool that uses AI to auto-assign tasks and predict project bottlenecks. Target: startup CTOs and team leads.'},
+  {icon:'lucide:briefcase',name:'Senior Dev Resume',tag:'Career',type:'Resume Summary',prompt:'Write a professional resume summary for a senior full-stack developer with 8+ years in React, Node.js, and AWS who has led teams and launched products for 1M+ users.'},
+  {icon:'lucide:rss',name:'AI Trends Blog',tag:'Content',type:'Blog Post Intro',prompt:'Write an engaging blog post intro about the top 5 AI trends reshaping software development in 2025. Conversational but insightful.'},
+  {icon:'lucide:mail',name:'Cold Outreach Email',tag:'Sales',type:'Email',prompt:'Write a professional cold outreach B2B email introducing our data analytics platform. Concise, value-focused, ends with a CTA for a 15-min call.'},
+  {icon:'lucide:share-2',name:'LinkedIn Post',tag:'Social',type:'Social Media Post',prompt:'Write a compelling LinkedIn post about lessons from a startup that failed. Vulnerable, but ends with actionable insights. ~200 words.'},
+  {icon:'lucide:feather',name:'Autumn City Poem',tag:'Creative',type:'Poem',prompt:'Write a vivid modern poem about the first day of autumn in a city. Sensory details, no clichés. Free verse, ~16 lines.'},
+  {icon:'lucide:book-open',name:'Sci-Fi Flash Fiction',tag:'Creative',type:'Short Story',prompt:'Write a flash fiction sci-fi story (under 300 words) about a spaceship AI that develops a fear of the dark. Surprise ending required.'},
+  {icon:'lucide:megaphone',name:'Google Ads Copy',tag:'Advertising',type:'Ad Copy',prompt:'Write 3 Google Ads copy variations for a meal prep delivery service. Each: headline (max 30 chars) + description (max 90 chars). Focus on time-saving and healthy eating.'},
+  {icon:'lucide:megaphone',name:'Product Hunt Launch',tag:'Marketing',type:'Ad Copy',prompt:'Write a Product Hunt launch tagline and short description for an AI app that turns voice notes into structured meeting summaries. Catchy, benefit-focused, under 60 words.'},
+];
+
+document.addEventListener('DOMContentLoaded',()=>{
+  updateCharCount(); updateBadges(); renderTemplates(); checkOllama();
+  document.getElementById('promptInput').addEventListener('input',updateCharCount);
+  document.getElementById('promptInput').addEventListener('keydown',e=>{ if((e.ctrlKey||e.metaKey)&&e.key==='Enter') generate(); });
+  document.getElementById('typeGrid').addEventListener('click',e=>{
+    const c=e.target.closest('.type-card'); if(!c) return;
+    document.querySelectorAll('.type-card').forEach(x=>x.classList.remove('active')); c.classList.add('active'); state.type=c.dataset.type;
+  });
+  document.getElementById('toneRow').addEventListener('click',e=>{
+    const p=e.target.closest('.tone-pill'); if(!p) return;
+    document.querySelectorAll('.tone-pill').forEach(x=>x.classList.remove('active')); p.classList.add('active'); state.tone=p.dataset.tone;
+  });
+  document.querySelectorAll('.nav-item[data-view]').forEach(n=>n.addEventListener('click',()=>switchView(n.dataset.view)));
+});
+
+async function checkOllama(){
+  const el=document.getElementById('ollamaStatus'), tx=document.getElementById('ollamaStatusText'), ms=document.getElementById('modelSel');
+  try{
+    const r=await fetch(`${SERVER}/api/models`); const d=await r.json();
+    if(d.error) throw new Error(d.error);
+    const models=d.models||[];
+    if(models.length>0) ms.innerHTML=models.map(m=>`<option value="${m.name}">${m.name}</option>`).join('');
+    el.className='ollama-status ok'; tx.textContent=`Connected — ${models.length} model${models.length!==1?'s':''} available`;
+  }catch{
+    el.className='ollama-status err'; tx.textContent='Not connected — run: node server.js';
+  }
+}
+
+function switchView(view){
+  document.querySelectorAll('.nav-item[data-view]').forEach(n=>n.classList.remove('active'));
+  document.querySelector(`.nav-item[data-view="${view}"]`).classList.add('active');
+  document.getElementById('viewGenerator').style.display=view==='generator'?'contents':'none';
+  ['history','saved','templates'].forEach(v=>{
+    document.getElementById(`view${v.charAt(0).toUpperCase()+v.slice(1)}`).classList.toggle('active',v===view);
+  });
+  document.getElementById('topbarTitle').textContent={generator:'Content Generator',history:'Generation History',saved:'Saved Results',templates:'Prompt Templates'}[view];
+  if(view==='history') renderHistory();
+  if(view==='saved') renderSaved();
+}
+
+async function generate(){
+  const prompt=document.getElementById('promptInput').value.trim();
+  if(!prompt){showToast('Enter a prompt first.','error');return;}
+  if(state.busy) return;
+  state.busy=true;
+  const t0=Date.now();
+  const btn=document.getElementById('genBtn'), out=document.getElementById('outputArea');
+  btn.disabled=true; btn.innerHTML='<div class="spinner"></div> Generating...';
+  out.className='output-area';
+  out.innerHTML='<span style="color:var(--text-muted);font-style:italic">Processing your request...</span>';
+  document.getElementById('outActions').style.display='none';
+  document.getElementById('outMeta').style.display='none';
+  document.getElementById('progWrap').style.display='block';
+  const pbar=document.getElementById('progBar');
+  let prog=0;
+  const pi=setInterval(()=>{ prog=Math.min(prog+Math.random()*5,80); pbar.style.width=prog+'%'; },350);
+  const lm={short:'~100 words',medium:'~250 words',long:'~500 words'};
+  const len=document.getElementById('lengthSel').value;
+  const lang=document.getElementById('langSel').value;
+  const model=document.getElementById('modelSel').value;
+  const system=`You are an expert professional copywriter. Write a ${state.type}.\nTone: ${state.tone}. Target length: ${lm[len]}. Language: ${lang}.\nWrite ONLY the content itself — no preamble, no "Here is...", no meta-commentary.\nFormat with clear paragraphs. Use **bold** for key phrases and _italics_ for emphasis where appropriate.`;
+  try{
+    const res=await fetch(`${SERVER}/api/generate`,{
+      method:'POST',headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({prompt,system,model})
+    });
+    const data=await res.json();
+    if(data.error) throw new Error(data.error);
+    clearInterval(pi); pbar.style.width='100%';
+    setTimeout(()=>{ document.getElementById('progWrap').style.display='none'; pbar.style.width='0%'; },400);
+    const html=data.text.split(/\n\n+/).map(p=>`<p>${p.replace(/\*\*(.*?)\*\*/g,'<strong>$1</strong>').replace(/_(.*?)_/g,'<em>$1</em>').replace(/\n/g,'<br>')}</p>`).join('');
+    out.className='output-area fade-up'; out.innerHTML=html; state.output=html;
+    const gt=((Date.now()-t0)/1000).toFixed(1), wc=out.innerText.split(/\s+/).filter(Boolean).length;
+    document.getElementById('outActions').style.display='flex';
+    document.getElementById('outMeta').style.display='flex';
+    document.getElementById('wcDisplay').textContent=`${wc} words`;
+    document.getElementById('timeDisplay').textContent=`${gt}s`;
+    addHistory(prompt,html); showToast('Content generated.','success');
+  }catch(e){
+    clearInterval(pi); document.getElementById('progWrap').style.display='none';
+    out.innerHTML=`<p style="color:var(--danger)">${e.message}<br><br>Make sure:<br>1. node server.js is running<br>2. ollama serve is running<br>3. ollama pull ${model} was done</p>`;
+    showToast('Generation failed.','error');
+  }finally{
+    state.busy=false; btn.disabled=false;
+    btn.innerHTML='<iconify-icon icon="lucide:arrow-right" style="font-size:15px"></iconify-icon> Generate Content';
+  }
+}
+
+function clearOutput(){
+  const o=document.getElementById('outputArea');
+  o.className='output-area empty';
+  o.innerHTML='<iconify-icon icon="lucide:file-text" class="empty-icon"></iconify-icon><div class="empty-text">Generated content will appear here.</div>';
+  document.getElementById('outActions').style.display='none';
+  document.getElementById('outMeta').style.display='none';
+  state.output='';
+}
+function copyOutput(){navigator.clipboard.writeText(document.getElementById('outputArea').innerText).then(()=>showToast('Copied.','success'));}
+function downloadOutput(){
+  const a=document.createElement('a');
+  a.href=URL.createObjectURL(new Blob([document.getElementById('outputArea').innerText],{type:'text/plain'}));
+  a.download=`concreate-${state.type.replace(/\s+/g,'-').toLowerCase()}.txt`; a.click(); showToast('Downloaded.','success');
+}
+function saveToSaved(){
+  if(!state.output) return;
+  const item={id:Date.now(),type:state.type,prompt:document.getElementById('promptInput').value.trim(),html:state.output,savedAt:new Date().toLocaleString()};
+  state.saved.unshift(item); localStorage.setItem('wp_s',JSON.stringify(state.saved)); updateBadges(); showToast('Saved.','success');
+}
+function addHistory(prompt,html){
+  const item={id:Date.now(),type:state.type,prompt,html,preview:document.getElementById('outputArea').innerText.slice(0,100),createdAt:new Date().toLocaleString()};
+  state.history.unshift(item); if(state.history.length>50) state.history=state.history.slice(0,50);
+  localStorage.setItem('wp_h',JSON.stringify(state.history)); updateBadges();
+}
+function renderHistory(){
+  const l=document.getElementById('historyList');
+  if(!state.history.length){l.innerHTML='<div class="empty-state"><iconify-icon icon="lucide:history"></iconify-icon><p>No history yet.</p></div>';return;}
+  l.innerHTML=state.history.map(i=>`<div class="hist-item" onclick="loadItem(${i.id},'history')"><div class="hist-icon"><iconify-icon icon="lucide:file-text"></iconify-icon></div><div class="hist-body"><div class="hist-prompt">${esc(i.prompt)}</div><div class="hist-preview">${esc(i.preview)}...</div><div class="hist-meta"><span>${i.type}</span><span>·</span><span>${i.createdAt}</span></div></div><div class="hist-actions"><button class="btn btn-ghost" onclick="event.stopPropagation();delItem(${i.id},'history')"><iconify-icon icon="lucide:trash-2" style="font-size:13px"></iconify-icon></button></div></div>`).join('');
+}
+function renderSaved(){
+  const l=document.getElementById('savedList');
+  if(!state.saved.length){l.innerHTML='<div class="empty-state"><iconify-icon icon="lucide:bookmark"></iconify-icon><p>Nothing saved yet.</p></div>';return;}
+  l.innerHTML=state.saved.map(i=>`<div class="hist-item"><div class="hist-icon"><iconify-icon icon="lucide:bookmark"></iconify-icon></div><div class="hist-body"><div class="hist-prompt">${esc(i.prompt)}</div><div class="hist-preview">${i.type} · ${i.savedAt}</div></div><div class="hist-actions"><button class="btn" onclick="loadItem(${i.id},'saved')"><iconify-icon icon="lucide:arrow-up-right" style="font-size:12px"></iconify-icon></button><button class="btn btn-ghost" onclick="delItem(${i.id},'saved')"><iconify-icon icon="lucide:trash-2" style="font-size:13px"></iconify-icon></button></div></div>`).join('');
+}
+function loadItem(id,src){
+  const item=state[src==='history'?'history':'saved'].find(h=>h.id===id); if(!item) return;
+  document.getElementById('promptInput').value=item.prompt; state.output=item.html;
+  switchView('generator');
+  const o=document.getElementById('outputArea'); o.className='output-area fade-up'; o.innerHTML=item.html;
+  document.getElementById('outActions').style.display='flex';
+  document.getElementById('outMeta').style.display='flex';
+  document.getElementById('wcDisplay').textContent=`${o.innerText.split(/\s+/).filter(Boolean).length} words`;
+  document.getElementById('timeDisplay').textContent='restored';
+  showToast('Loaded.','info');
+}
+function delItem(id,src){
+  if(src==='history'){state.history=state.history.filter(h=>h.id!==id);localStorage.setItem('wp_h',JSON.stringify(state.history));}
+  else{state.saved=state.saved.filter(s=>s.id!==id);localStorage.setItem('wp_s',JSON.stringify(state.saved));}
+  updateBadges(); src==='history'?renderHistory():renderSaved();
+}
+function clearHistory(){state.history=[];localStorage.setItem('wp_h','[]');updateBadges();renderHistory();showToast('Cleared.','info');}
+function clearSaved(){state.saved=[];localStorage.setItem('wp_s','[]');updateBadges();renderSaved();showToast('Cleared.','info');}
+function renderTemplates(){
+  document.getElementById('templatesList').innerHTML=templates.map(t=>`<div class="tcard" onclick='useTemplate(${JSON.stringify(t).replace(/'/g,"&#39;")})'><div class="tcard-icon"><iconify-icon icon="${t.icon}" style="font-size:17px"></iconify-icon></div><div class="tcard-name">${t.name}</div><div class="tcard-desc">${t.prompt.slice(0,75)}...</div><span class="tcard-tag">${t.tag}</span></div>`).join('');
+}
+function useTemplate(t){
+  document.getElementById('promptInput').value=t.prompt;
+  document.querySelectorAll('.type-card').forEach(c=>c.classList.toggle('active',c.dataset.type===t.type));
+  state.type=t.type; switchView('generator'); showToast('Template loaded.','info');
+}
+function updateCharCount(){const l=document.getElementById('promptInput').value.length;document.getElementById('charCount').textContent=`${l} character${l!==1?'s':''}`;}
+function updateBadges(){document.getElementById('historyCount').textContent=state.history.length;document.getElementById('savedCount').textContent=state.saved.length;}
+function esc(s){const d=document.createElement('div');d.textContent=s;return d.innerHTML;}
+function showToast(msg,type='success'){
+  const c=document.getElementById('toastCtr');
+  const icons={success:'lucide:check',error:'lucide:x',info:'lucide:info'};
+  const t=document.createElement('div'); t.className=`toast ${type}`;
+  t.innerHTML=`<iconify-icon icon="${icons[type]}" style="font-size:14px;opacity:.6"></iconify-icon> ${msg}`;
+  c.appendChild(t); setTimeout(()=>t.remove(),3000);
+}
+</script>
+</body>
+</html>
